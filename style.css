@@ -1,0 +1,30 @@
+
+
+.float-child {
+    width: 30%;
+    float: left;
+    border: 2px dashed black;
+    margin-left: 20px;
+}  
+
+.box1 {
+    width: 29%;
+    border: 2px dashed black;
+    margin-right: 15px;
+}
+
+.box2 {
+    width: 40%;
+    border: 2px dashed black;
+}
+
+.box3 {
+    width: 29%;
+    border: 2px dashed black;
+    margin-left: 15px;
+}
+
+.boxbox {
+    display: flex;
+    justify-content: center;
+}

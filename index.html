@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>To-Do App</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body onload="startUp()">
+        <div class="boxbox">
+        <div class="box1"><p>test1</p>
+            <p class="subheading">Write your description for your task below. It will pop up as a task in the middle section.</p>
+            <input type="text" id="userInput" placeholder="Start writing here..."><br>
+            <p class="subheading">Priority is either High, Medium or Low. The colour will change based on urgency to help differentiate tasks.</p>
+            <select name="priority" id="priority">
+                <option value="high">High</option>
+                <option value="med">Medium</option>
+                <option value="low">Low</option>
+            </select>
+            <p class="subheading">Due date will help give a sense of when each task needs to be finalised.</p>
+        </div>
+        <div class="box2"><p>test2</p>
+        </div>
+        <div class="box3"><p>test3</p>
+            <p id="print1">1</p>
+            <p id="print2">2</p>
+            <p id="print3">3</p>
+            <p id="print4">4</p>
+        </div>
+        </div>
+        <script src="script.js" async defer></script>
+    </body>
+</html>
