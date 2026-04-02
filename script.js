@@ -55,7 +55,7 @@ function readDate()
 function pushObject(newTask, priority, date)
 {
     count++;
-    let localcount = count;
+    let localcount = count -1;
     //document.getElementById('print1').innerHTML = "Text:" + newTask + " Priority:" + priority + " Date:" + date;
     let taskInfo = {
         Text: newTask,
@@ -70,7 +70,7 @@ function pushObject(newTask, priority, date)
 function createTask(textInfo, priority, date)
 {
     // this will make all id's seperate. This should align with the array index, -1 cause of zero-indexing.
-    let localcount = count;
+    let localcount = count -1;
 
     // a new div element, with id of 'task' + count, and class to add fancy border
     let taskInstance = document.createElement("div");
@@ -99,5 +99,30 @@ function createTask(textInfo, priority, date)
         parentLocation = document.getElementById('High');
     };
 
+    let deleteButton = document.createElement("img");
+    deleteButton.classList.add('trash');
+    deleteButton.onclick = function() {
+        deleteTask(localcount);
+    };
+    taskInstance.appendChild(deleteButton);
+
+    let checkBox = document.createElement("input");
+    checkBox.type = 'checkbox';
+    checkBox.classList.add('checkBox');
+    checkBox.onclick = function() {
+        moveTask();
+    };
+    taskInstance.appendChild(checkBox);
+
     parentLocation.appendChild(taskInstance);
+}
+
+function deleteTask(param)
+{
+    document.getElementById('print4').innerHTML = "deleteFound! " + param;
+}
+
+function moveTask()
+{
+
 }
