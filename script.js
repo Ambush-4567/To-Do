@@ -7,13 +7,15 @@ let listItem = [
     }
 ];
 
+let count = 0;
+
 function startUp()
 {
     //document.getElementById('print1').innerHTML = ("startUp ran")
     document.addEventListener('keydown', function(event) {
     // Check if the key pressed was 'Enter'
     if (event.key === 'Enter') {
-        document.getElementById('print2').innerHTML = ("yes enter was pressed")
+        document.getElementById('print2').innerHTML = ("yes enter was pressed");
         if (validateText()) {
             
         } else {
@@ -31,5 +33,22 @@ function validateText()
         return false;
     }
     document.getElementById('print3').innerHTML = typeof newTask;
-    return true;
+    createTask(newTask);
+}
+
+function createTask(textInfo)
+{
+    count++;
+    let localcount = count;
+
+    let taskInstance = document.createElement("div");
+    taskInstance.id = "task" + localcount;
+    taskInstance.classList.add('textBorder');
+
+    let textInstance = document.createElement("p");
+    textInstance.classList.add('para');
+    textInstance.textContent = textInfo;
+    taskInstance.appendChild(textInstance);
+
+    document.getElementById("div2").appendChild(taskInstance);
 }
