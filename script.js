@@ -16,7 +16,7 @@ const monthDays = {
 let listItems = [
     {
         Text: "try adding your own task.",
-        Priority: "low",
+        Priority: "Medium",
         Due: "27/3/26",
         ID: 1,
     }
@@ -70,8 +70,8 @@ function initialiseDays()
     const monthSelect = document.getElementById('month');
     const daySelect = document.getElementById('day');
 
-    const selectedMonth = monthSelect.value; 
-    const daysInMonth = monthDays[selectedMonth];
+    let selectedMonth = monthSelect.value; 
+    let daysInMonth = monthDays[selectedMonth];
 
     daySelect.innerHTML = ""; // clear previous options
 
@@ -108,9 +108,15 @@ function readDate()
     let month = document.getElementById('month').value;
     let year = document.getElementById('year').value;
 
+    // convert written month to month shorthand
+    // same keys as done in date initialisation
+    const monthNames = Object.keys(monthDays);
+    // find index where, for example, January (month var) = January (object) in the array.
+    let originalPos = monthNames.findIndex(index => index === month);
+    //document.getElementById('print5').innerHTML = "array position is: " + originalPos;
+    let correctedMonth = originalPos + 1;
 
-    const date = "27/3/26";
-    let date2 = toString(day) + "/" + month + "/" + toString(year);
+    let date2 = day + "/" + correctedMonth + "/" + year;
 
     return date2;
 }
@@ -149,18 +155,7 @@ function createTask(textInfo, priority, date)
     textInstance.textContent = modifiedText;
     taskInstance.appendChild(textInstance);
 
-    // default div location for new element if all goes wrong
-    let parentLocation = document.getElementById('div2');
-
-    // use priority parameter to move taskInstance into a sub-div of div2. 
-    let prio = priority;
-    if (prio == "High") {
-        parentLocation = document.getElementById('High');
-    } else if (prio == "Medium") {
-        parentLocation = document.getElementById('Medium');
-    } else {
-        parentLocation = document.getElementById('Low');
-    };
+    let parentLocation = orderPriority(priority);
 
     // deletebutton has a class which will add a trash png and red backdrop. 
     let deleteButton = document.createElement("img");
@@ -173,6 +168,7 @@ function createTask(textInfo, priority, date)
     let checkBox = document.createElement("input");
     checkBox.type = 'checkbox';
     checkBox.classList.add('checkBox');
+    checkBox.id = "move" + localcount;
     checkBox.onclick = function() {
         moveTask(localcount);
     };
@@ -180,6 +176,23 @@ function createTask(textInfo, priority, date)
 
     parentLocation.appendChild(taskInstance);
     //document.getElementById('print3').innerHTML = taskInstance.id;
+}
+
+function orderPriority(priority)
+{
+    // default div location for new element if all goes wrong
+    let parentLocation = document.getElementById('div2');
+
+    // use priority parameter to move taskInstance into a sub-div of div2. 
+    let prio = priority;
+    if (prio == "High") {
+        parentLocation = document.getElementById('High');
+    } else if (prio == "Medium") {
+        parentLocation = document.getElementById('Medium');
+    } else {
+        parentLocation = document.getElementById('Low');
+    };
+    return parentLocation;
 }
 
 function deleteTask(param)
@@ -196,7 +209,8 @@ function deleteTask(param)
 function moveTask(param)
 {
     // cut from listItems array
-    let element = listItems.splice(param, 1);
+    let elementIndex = listItems.findIndex(index => index.ID === param);
+    let element = listItems.splice(elementIndex, 1)[0];
 
     // add to finished array
     doneItems.push(element);
@@ -206,8 +220,48 @@ function moveTask(param)
     movedElement.classList.remove('textBorder');
     movedElement.classList.add('doneBorder');
 
+    // access child checkbox
+    var checkBox = document.getElementById('move' + param);
+     
+    checkBox.onclick = null;
+    checkBox.onclick = function() {
+        reinstateTask(param);
+    };
+
     // append element to new parent
     document.getElementById('div3').appendChild(movedElement);
+
+    // save to localstorage
+}
+
+function reinstateTask(param)
+{
+    // cut from listItems array
+    let elementIndex = doneItems.findIndex(index => index.ID === param);
+    let element = doneItems.splice(elementIndex, 1)[0];
+
+    // add to finished array
+    listItems.push(element);
+
+    // fuck with classlists
+    let movedElement = document.getElementById("task" + param);
+    movedElement.classList.remove('doneBorder');
+    movedElement.classList.add('textBorder');
+
+    // access child checkbox
+    var checkBox = document.getElementById('move' + param);
+    checkBox.onclick = null;
+    checkBox.onclick = function() {
+        moveTask(param);
+    };
+
+    let priorityIndex = listItems.findIndex(index => index.ID === param);
+    let priority =  listItems[priorityIndex].Priority;
+    document.getElementById('print5').innerHTML = priority;
+    let parentLocation = orderPriority(priority);
+
+    // append element to new parent
+    parentLocation.appendChild(movedElement);
 
     // save to localstorage
 }
