@@ -14,12 +14,12 @@ const monthDays = {
 };
 
 let listItems = [
-    {
-        Text: "try adding your own task.",
-        Priority: "Medium",
-        Due: "27/3/26",
-        ID: 1,
-    }
+    //{
+        //Text: "try adding your own task.",
+        //Priority: "Medium",
+        //Due: "27/3/26",
+        //ID: 1,
+    //}
 ];
 
 let doneItems = [
@@ -28,12 +28,16 @@ let doneItems = [
     }
 ];
 
-let count = 0;
+let state = [ {
+    currentIndex: 0,
+    }
+];
 
 function startUp()
 {
     //document.getElementById('print1').innerHTML = ("startUp ran")
     initialiseDates();
+    importData();
     document.getElementById('month').addEventListener('change', initialiseDays);
     document.addEventListener('keydown', function(event) {
     // Check if the key pressed was 'Enter'
@@ -47,6 +51,32 @@ function startUp()
     }
 
 });
+}
+
+function saveData()
+{
+    localStorage.setItem('listItems', JSON.stringify(listItems));
+    localStorage.setItem('doneItems', JSON.stringify(doneItems));
+    localStorage.setItem('state', JSON.stringify(state));
+}
+
+function importData()
+{
+    if (localStorage.getItem('listItems')) {
+       listItems = JSON.parse(localStorage.getItem('listItems')); }
+    if (localStorage.getItem('doneItems')) {
+       doneItems = JSON.parse(localStorage.getItem('doneItems')); }
+    if (localStorage.getItem('state')) {
+       state = JSON.parse(localStorage.getItem('state')); }
+}
+
+function deleteData()
+{
+    if (confirm("Are you sure you want to delete all data?")) {
+       localStorage.clear();
+	   location.reload(); 
+    }
+
 }
 
 function initialiseDates()
@@ -123,15 +153,17 @@ function readDate()
 
 function pushObject(newTask, priority, date)
 {
-    count++;
-    let localcount = count -1;
+    // state is equal to 0 on first call of this func
+    let currentIndex = state[0].currentIndex;
+
     //document.getElementById('print1').innerHTML = "Text:" + newTask + " Priority:" + priority + " Date:" + date;
     let taskInfo = {
         Text: newTask,
         Priority: priority,
         Due: date, 
-        ID: localcount,
+        ID: currentIndex,
     };
+    state[0].currentIndex++;
     listItems.push(taskInfo);
     document.getElementById('print1').innerHTML = JSON.stringify(listItems);
 }
@@ -139,7 +171,8 @@ function pushObject(newTask, priority, date)
 function createTask(textInfo, priority, date)
 {
     // this will make all id's seperate. This should align with the array index, -1 cause of zero-indexing.
-    let localcount = count -1;
+    let currentIndex = state[0].currentIndex;
+    let localcount = currentIndex -1;
 
     // a new div element, with id of 'task' + count, and class to add fancy border
     let taskInstance = document.createElement("div");
@@ -176,6 +209,7 @@ function createTask(textInfo, priority, date)
 
     parentLocation.appendChild(taskInstance);
     //document.getElementById('print3').innerHTML = taskInstance.id;
+    saveData();
 }
 
 function orderPriority(priority)
@@ -191,7 +225,7 @@ function orderPriority(priority)
         parentLocation = document.getElementById('Medium');
     } else {
         parentLocation = document.getElementById('Low');
-    };
+    }
     return parentLocation;
 }
 
@@ -232,36 +266,34 @@ function moveTask(param)
     document.getElementById('div3').appendChild(movedElement);
 
     // save to localstorage
+    saveData();
 }
 
 function reinstateTask(param)
 {
-    // cut from listItems array
-    let elementIndex = doneItems.findIndex(index => index.ID === param);
-    let element = doneItems.splice(elementIndex, 1)[0];
+    
+    let elementIndex = doneItems.findIndex(item => item.ID === param);
+    
+    if (elementIndex === -1) return;
 
-    // add to finished array
+    let element = doneItems.splice(elementIndex, 1)[0];
+    document.getElementById('print4').innerHTML = 'this ran';
     listItems.push(element);
 
-    // fuck with classlists
     let movedElement = document.getElementById("task" + param);
     movedElement.classList.remove('doneBorder');
     movedElement.classList.add('textBorder');
 
-    // access child checkbox
-    var checkBox = document.getElementById('move' + param);
-    checkBox.onclick = null;
-    checkBox.onclick = function() {
-        moveTask(param);
-    };
+    let checkBox = document.getElementById('move' + param);
+    checkBox.onclick = () => moveTask(param);
 
-    let priorityIndex = listItems.findIndex(index => index.ID === param);
-    let priority =  listItems[priorityIndex].Priority;
-    document.getElementById('print5').innerHTML = priority;
+    let priorityIndex = listItems.findIndex(item => item.ID === param);
+    if (priorityIndex === -1) return;
+
+    let priority = listItems[priorityIndex].Priority;
     let parentLocation = orderPriority(priority);
 
-    // append element to new parent
     parentLocation.appendChild(movedElement);
 
-    // save to localstorage
+    saveData();
 }
