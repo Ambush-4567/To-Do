@@ -1,3 +1,17 @@
+const monthDays = {
+    January: 31,
+    February: 28,
+    March: 31,
+    April: 30,
+    May: 31,
+    June: 30, 
+    July: 31,
+    August: 31, 
+    September: 30,
+    October: 31,
+    November: 30,
+    December: 31,
+};
 
 let listItems = [
     {
@@ -19,6 +33,8 @@ let count = 0;
 function startUp()
 {
     //document.getElementById('print1').innerHTML = ("startUp ran")
+    initialiseDates();
+    document.getElementById('month').addEventListener('change', initialiseDays);
     document.addEventListener('keydown', function(event) {
     // Check if the key pressed was 'Enter'
     if (event.key === 'Enter') {
@@ -31,6 +47,40 @@ function startUp()
     }
 
 });
+}
+
+function initialiseDates()
+{
+    const monthSelect = document.getElementById('month');
+    // the array is an object, and specifically a key-value pair. selecting the 'keys' specifically will return month names rather than month days.
+    const months = Object.keys(monthDays);
+
+    // let i begin at 0. while i is less than the amount of months, increment i after creating a new option element as a child of the select id at "months".
+    for (let i = 0; i < months.length; i++) {
+        let monthOption = document.createElement('option');
+        monthOption.value = months[i];
+        monthOption.text = months[i];
+        monthSelect.appendChild(monthOption);
+    }
+    initialiseDays();
+}
+
+function initialiseDays()
+{
+    const monthSelect = document.getElementById('month');
+    const daySelect = document.getElementById('day');
+
+    const selectedMonth = monthSelect.value; 
+    const daysInMonth = monthDays[selectedMonth];
+
+    daySelect.innerHTML = ""; // clear previous options
+
+    for (let i = 0; i < daysInMonth; i++) {
+        let dayOption = document.createElement('option');
+        dayOption.value = i + 1;
+        dayOption.text = i + 1;
+        daySelect.appendChild(dayOption);
+    }
 }
 
 function validateText()
@@ -54,8 +104,15 @@ function readPriority()
 
 function readDate()
 {
+    let day = document.getElementById('day').value;
+    let month = document.getElementById('month').value;
+    let year = document.getElementById('year').value;
+
+
     const date = "27/3/26";
-    return date;
+    let date2 = toString(day) + "/" + month + "/" + toString(year);
+
+    return date2;
 }
 
 function pushObject(newTask, priority, date)
@@ -84,7 +141,7 @@ function createTask(textInfo, priority, date)
     taskInstance.classList.add('textBorder');
 
     // use date to append to end of text element for readability.
-    let modifiedText = textInfo + " Due (" + date + ")"
+    let modifiedText = textInfo + " Due (" + date + ")";
 
     // make text into a paragraph element. add class for styling, then append to taskInstance (above) to make it a child.
     let textInstance = document.createElement("p");
@@ -132,7 +189,7 @@ function deleteTask(param)
         let deletedElement = document.getElementById("task" + param);
         //document.getElementById('print4').innerHTML = deletedElement;
         deletedElement.remove();
-    } ;
+    }
     
 }
 
