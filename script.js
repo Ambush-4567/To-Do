@@ -8,6 +8,12 @@ let listItems = [
     }
 ];
 
+let doneItems = [
+    {
+
+    }
+];
+
 let count = 0;
 
 function startUp()
@@ -64,7 +70,7 @@ function pushObject(newTask, priority, date)
         ID: localcount,
     };
     listItems.push(taskInfo);
-    document.getElementById('print1').innerHTML = listItems;
+    document.getElementById('print1').innerHTML = JSON.stringify(listItems);
 }
 
 function createTask(textInfo, priority, date)
@@ -82,7 +88,7 @@ function createTask(textInfo, priority, date)
 
     // make text into a paragraph element. add class for styling, then append to taskInstance (above) to make it a child.
     let textInstance = document.createElement("p");
-    textInstance.classList.add('para');
+    textInstance.classList.add('para', 'ubuntu-medium-italic');
     textInstance.textContent = modifiedText;
     taskInstance.appendChild(textInstance);
 
@@ -96,9 +102,10 @@ function createTask(textInfo, priority, date)
     } else if (prio == "Medium") {
         parentLocation = document.getElementById('Medium');
     } else {
-        parentLocation = document.getElementById('High');
+        parentLocation = document.getElementById('Low');
     };
 
+    // deletebutton has a class which will add a trash png and red backdrop. 
     let deleteButton = document.createElement("img");
     deleteButton.classList.add('trash');
     deleteButton.onclick = function() {
@@ -110,19 +117,40 @@ function createTask(textInfo, priority, date)
     checkBox.type = 'checkbox';
     checkBox.classList.add('checkBox');
     checkBox.onclick = function() {
-        moveTask();
+        moveTask(localcount);
     };
     taskInstance.appendChild(checkBox);
 
     parentLocation.appendChild(taskInstance);
+    //document.getElementById('print3').innerHTML = taskInstance.id;
 }
 
 function deleteTask(param)
 {
-    document.getElementById('print4').innerHTML = "deleteFound! " + param;
+    if (confirm("This task will be deleted. Are you sure?")) {
+        //document.getElementById('print4').innerHTML = "deleteFound! " + param;
+        let deletedElement = document.getElementById("task" + param);
+        //document.getElementById('print4').innerHTML = deletedElement;
+        deletedElement.remove();
+    } ;
+    
 }
 
-function moveTask()
+function moveTask(param)
 {
+    // cut from listItems array
+    let element = listItems.splice(param, 1);
 
+    // add to finished array
+    doneItems.push(element);
+
+    // fuck with classlists
+    let movedElement = document.getElementById("task" + param);
+    movedElement.classList.remove('textBorder');
+    movedElement.classList.add('doneBorder');
+
+    // append element to new parent
+    document.getElementById('div3').appendChild(movedElement);
+
+    // save to localstorage
 }

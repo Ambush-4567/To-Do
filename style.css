@@ -53,9 +53,17 @@
     /* top right bottom left*/
     padding: 5px 0px 5px 0px;
     background-color: rgba(101, 161, 242, 0.8);
-    font-family: "Ubuntu", sans-serif;
-    font-weight: 500;
-    font-style: italic;
+}
+
+.doneBorder {
+    border: 3px solid green;
+    border-radius: 20px;
+    width: 90%;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    /* top right bottom left*/
+    padding: 5px 0px 5px 0px;
+    background-color: rgba(96, 205, 76, 0.8);
 }
 
 .para {
