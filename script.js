@@ -23,9 +23,7 @@ let listItems = [
 ];
 
 let doneItems = [
-    {
-
-    }
+    
 ];
 
 let state = [ {
@@ -38,6 +36,7 @@ function startUp()
     //document.getElementById('print1').innerHTML = ("startUp ran")
     initialiseDates();
     importData();
+    setInterval(printArr, 500);
     document.getElementById('month').addEventListener('change', initialiseDays);
     document.addEventListener('keydown', function(event) {
     // Check if the key pressed was 'Enter'
@@ -53,6 +52,11 @@ function startUp()
 });
 }
 
+function printArr()
+{
+    document.getElementById('print1').innerHTML = JSON.stringify(listItems) + " Done array next: " + JSON.stringify(doneItems);
+}
+
 function saveData()
 {
     localStorage.setItem('listItems', JSON.stringify(listItems));
@@ -63,9 +67,11 @@ function saveData()
 function importData()
 {
     if (localStorage.getItem('listItems')) {
-       listItems = JSON.parse(localStorage.getItem('listItems')); }
+       listItems = JSON.parse(localStorage.getItem('listItems'));
+       importOngoing(listItems); }
     if (localStorage.getItem('doneItems')) {
-       doneItems = JSON.parse(localStorage.getItem('doneItems')); }
+       doneItems = JSON.parse(localStorage.getItem('doneItems'));
+       importDone(doneItems); }
     if (localStorage.getItem('state')) {
        state = JSON.parse(localStorage.getItem('state')); }
 }
@@ -124,6 +130,7 @@ function validateText()
     let date = readDate();
     pushObject(newTask, priority, date);
     createTask(newTask, priority, date);
+    saveData();
 }
 
 function readPriority()
@@ -163,7 +170,7 @@ function pushObject(newTask, priority, date)
         Due: date, 
         ID: currentIndex,
     };
-    state[0].currentIndex++;
+    //state[0].currentIndex++;
     listItems.push(taskInfo);
     document.getElementById('print1').innerHTML = JSON.stringify(listItems);
 }
@@ -172,7 +179,7 @@ function createTask(textInfo, priority, date)
 {
     // this will make all id's seperate. This should align with the array index, -1 cause of zero-indexing.
     let currentIndex = state[0].currentIndex;
-    let localcount = currentIndex -1;
+    let localcount = currentIndex;
 
     // a new div element, with id of 'task' + count, and class to add fancy border
     let taskInstance = document.createElement("div");
@@ -209,7 +216,88 @@ function createTask(textInfo, priority, date)
 
     parentLocation.appendChild(taskInstance);
     //document.getElementById('print3').innerHTML = taskInstance.id;
+    state[0].currentIndex++;
     saveData();
+}
+
+function importOngoing(array)
+{
+    for (let i = 0; i < array.length; i++) {
+
+        // a new div element, with id of 'task' + count, and class to add fancy border
+        let taskInstance = document.createElement("div");
+        taskInstance.id = "task" + array[i].ID;
+        taskInstance.classList.add('textBorder');
+
+        // use date to append to end of text element for readability.
+        let modifiedText = array[i].Text + " Due (" + array[i].Due + ")";
+
+        // make text into a paragraph element. add class for styling, then append to taskInstance (above) to make it a child.
+        let textInstance = document.createElement("p");
+        textInstance.classList.add('para', 'ubuntu-medium-italic');
+        textInstance.textContent = modifiedText;
+        taskInstance.appendChild(textInstance);
+
+        let parentLocation = orderPriority(array[i].Priority);
+
+        // deletebutton has a class which will add a trash png and red backdrop. 
+        let deleteButton = document.createElement("img");
+        deleteButton.classList.add('trash');
+        deleteButton.onclick = function() {
+            deleteTask(array[i].ID);
+        };
+        taskInstance.appendChild(deleteButton);
+
+        let checkBox = document.createElement("input");
+        checkBox.type = 'checkbox';
+        checkBox.classList.add('checkBox');
+        checkBox.id = "move" + array[i].ID;
+        checkBox.onclick = function() {
+            moveTask(array[i].ID);
+        };
+        taskInstance.appendChild(checkBox);
+
+        parentLocation.appendChild(taskInstance);
+    }
+}
+
+function importDone(array)
+{
+    for (let i = 0; i < array.length; i++) {
+
+        // a new div element, with id of 'task' + count, and class to add fancy border
+        let taskInstance = document.createElement("div");
+        taskInstance.id = "task" + array[i].ID;
+        taskInstance.classList.add('doneBorder');
+
+        // use date to append to end of text element for readability.
+        let modifiedText = array[i].Text + " Due (" + array[i].Due + ")";
+
+        // make text into a paragraph element. add class for styling, then append to taskInstance (above) to make it a child.
+        let textInstance = document.createElement("p");
+        textInstance.classList.add('para', 'ubuntu-medium-italic');
+        textInstance.textContent = modifiedText;
+        taskInstance.appendChild(textInstance);
+
+        // deletebutton has a class which will add a trash png and red backdrop. 
+        let deleteButton = document.createElement("img");
+        deleteButton.classList.add('trash');
+        deleteButton.onclick = function() {
+            deleteTask(array[i].ID);
+        };
+        taskInstance.appendChild(deleteButton);
+
+        let checkBox = document.createElement("input");
+        checkBox.type = 'checkbox';
+        checkBox.classList.add('checkBox');
+        checkBox.id = "move" + array[i].ID;
+        checkBox.onclick = function() {
+            reinstateTask(array[i].ID);
+        };
+        taskInstance.appendChild(checkBox);
+
+        document.getElementById('div3').appendChild(taskInstance);
+    }
 }
 
 function orderPriority(priority)
@@ -237,14 +325,18 @@ function deleteTask(param)
         //document.getElementById('print4').innerHTML = deletedElement;
         deletedElement.remove();
     }
+    saveData();
     
 }
 
 function moveTask(param)
 {
     // cut from listItems array
-    let elementIndex = listItems.findIndex(index => index.ID === param);
+    let elementIndex = listItems.findIndex(index => index.ID === Number(param));
     let element = listItems.splice(elementIndex, 1)[0];
+
+    //if (elementIndex === -1) return;
+
 
     // add to finished array
     doneItems.push(element);
@@ -272,9 +364,9 @@ function moveTask(param)
 function reinstateTask(param)
 {
     
-    let elementIndex = doneItems.findIndex(item => item.ID === param);
+    let elementIndex = doneItems.findIndex(item => item.ID === Number(param));
     
-    if (elementIndex === -1) return;
+    //if (elementIndex === -1) return;
 
     let element = doneItems.splice(elementIndex, 1)[0];
     document.getElementById('print4').innerHTML = 'this ran';
@@ -296,4 +388,37 @@ function reinstateTask(param)
     parentLocation.appendChild(movedElement);
 
     saveData();
+}
+
+function exportSave()
+{
+    const gameData = JSON.parse(localStorage.getItem('gS'));
+    const jsonData2 = JSON.stringify(gameData);
+
+    const dataURL = window.URL.createObjectURL(new Blob([jsonData2], {type: 'text/json'}));
+
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.setAttribute('download', 'gameData2.json');
+    link.click();   
+}
+
+function importData() 
+{
+    const importFileInput = document.getElementById('importFile');
+
+    importFileInput.addEventListener('change', (event) => {
+        if (event.target.files[0]) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const importedData = JSON.parse(e.target.result);
+                gS = { ...gS, ...importedData }; // Merge importedData into gS
+saveGame(); // Save updated gS to localStorage
+};
+
+            reader.readAsText(file);
+        }
+    });
 }
