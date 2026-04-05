@@ -392,33 +392,71 @@ function reinstateTask(param)
 
 function exportSave()
 {
-    const gameData = JSON.parse(localStorage.getItem('gS'));
-    const jsonData2 = JSON.stringify(gameData);
+    const saveData = {
+        listItems,
+        doneItems,
+        state
+    };
 
-    const dataURL = window.URL.createObjectURL(new Blob([jsonData2], {type: 'text/json'}));
+    const jsonData = JSON.stringify(saveData);
+
+    const dataURL = window.URL.createObjectURL(
+        new Blob([jsonData], { type: 'application/json' })
+    );
 
     const link = document.createElement('a');
     link.href = dataURL;
-    link.setAttribute('download', 'gameData2.json');
+    link.setAttribute('download', 'taskData.json');
     link.click();   
 }
 
-function importData() 
+function importFile() 
 {
-    const importFileInput = document.getElementById('importFile');
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
 
-    importFileInput.addEventListener('change', (event) => {
-        if (event.target.files[0]) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
+    input.onchange = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
-            reader.onload = (e) => {
-                const importedData = JSON.parse(e.target.result);
-                gS = { ...gS, ...importedData }; // Merge importedData into gS
-saveGame(); // Save updated gS to localStorage
-};
+        const reader = new FileReader();
 
-            reader.readAsText(file);
-        }
-    });
+        reader.onload = (e) => {
+            try {
+                let text = e.target.result;
+
+                // remove BOM
+                text = text.replace(/^\uFEFF/, '');
+
+                if (!text || text.trim() === "") {
+                    throw new Error("Empty file");
+                }
+
+                const importedData = JSON.parse(text);
+
+                listItems = importedData.listItems || [];
+                doneItems = importedData.doneItems || [];
+
+                // only assign if it exists AND variable exists
+                if (typeof state !== "undefined") {
+                    state = importedData.state || [];
+                }
+
+                saveData();
+                importOngoing(listItems);
+                importDone(doneItems);
+
+                console.log("Import successful:", importedData);
+            } 
+            catch (err) {
+                alert("Invalid save file: " + err.message);
+                console.error("Import error:", err);
+            }
+        };
+
+        reader.readAsText(file);
+    };
+
+    input.click();
 }
