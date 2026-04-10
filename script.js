@@ -14,12 +14,24 @@ const monthDays = {
 };
 
 let listItems = [
-    //{
-        //Text: "try adding your own task.",
-        //Priority: "Medium",
-        //Due: "27/3/26",
-        //ID: 1,
-    //}
+    {"Text":"BUSINESS: Read over unit outline","Priority":"Low","Due":"20/4/2026","ID":0},
+    {"Text":"PERSONAL: Enhance UX of To do list","Priority":"Medium","Due":"20/4/2026","ID":1},
+    {"Text":"PERSONAL: Enhance UI of To do list","Priority":"Medium","Due":"20/4/2026","ID":2},
+    {"Text":"GENERAL: fill calendar with assessments.","Priority":"High","Due":"20/4/2026","ID":3},
+    {"Text":"MATH: Practice existing topics and other topics covered in unit outline","Priority":"Medium","Due":"20/4/2026","ID":4},
+    {"Text":"MATH: Read over unit outline","Priority":"Low","Due":"20/4/2026","ID":5},
+    {"Text":"English: Read over unit outline","Priority":"Low","Due":"20/4/2026","ID":6},
+    {"Text":"ENGLISH: Read over unit outline","Priority":"Low","Due":"20/4/2026","ID":7},
+    {"Text":"ENGLISH: Read academic articles Dani posted","Priority":"High","Due":"20/4/2026","ID":8},
+    {"Text":"ENGLISH: Read egyptian book","Priority":"High","Due":"20/4/2026","ID":9},
+    {"Text":"DIGI: Read over unit outline","Priority":"Low","Due":"20/4/2026","ID":11},
+    {"Text":"CYBER: Learn more about arduino programming","Priority":"Low","Due":"20/4/2026","ID":12},
+    {"Text":"CYBER: Learn more about arduino programming","Priority":"High","Due":"20/4/2026","ID":13},
+    {"Text":"CYBER: Begin assessment 2","Priority":"High","Due":"20/4/2026","ID":14},
+    {"Text":"DIGI: Begin assessment 2","Priority":"High","Due":"20/4/2026","ID":15},
+    {"Text":"CYBER: Read over unit outline","Priority":"Low","Due":"20/4/2026","ID":10},
+    {"Text":"DIGI: Finish cert III tasks (2 remaining)","Priority":"High","Due":"20/4/2026","ID":16},
+    {"Text":"PERSONAL: Gather uni course information + gather general uni info","Priority":"Medium","Due":"20/4/2026","ID":17}
 ];
 
 let doneItems = [
@@ -27,7 +39,7 @@ let doneItems = [
 ];
 
 let state = [ {
-    currentIndex: 0,
+    currentIndex: 18,
     }
 ];
 
@@ -35,6 +47,12 @@ function startUp()
 {
     //document.getElementById('print1').innerHTML = ("startUp ran")
     initialiseDates();
+    if (listItems.length >= 1) {
+        importOngoing(listItems);
+    }
+    if (doneItems.length >= 1) {
+        importDone(doneItems);
+    }
     importData();
     setInterval(printArr, 500);
     document.getElementById('month').addEventListener('change', initialiseDays);
